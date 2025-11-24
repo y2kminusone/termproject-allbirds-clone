@@ -13,13 +13,12 @@ React(Vite) + Express + Prisma(SQLite) 기반의 텀프 프로젝트입니다.
 
 # 📁 프로젝트 구조
 
-```
 
 termproject-allbirds-clone/
 ├── backend/     # Express + Prisma + SQLite
 └── frontend/    # React + Vite
 
-````
+```
 
 ---
 
