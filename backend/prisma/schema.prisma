@@ -13,7 +13,7 @@ enum Role {
 
 enum Material {
   TREE
-  WOOLㅊ
+  WOOL
 }
 
 enum CategoryCode {
