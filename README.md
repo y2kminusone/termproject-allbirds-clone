@@ -130,7 +130,7 @@ backend/
 │   ├── schema.prisma
 │   └── migrations/
 ├── src/
-│   └── index.js
+│   └── app.js
 ├── mydb.sqlite
 ├── prisma.config.ts
 └── .env

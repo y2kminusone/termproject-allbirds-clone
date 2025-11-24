@@ -2,9 +2,9 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
+  "main": "app.js",
   "scripts": {
-    "dev": "node src/index.js",
+    "dev": "node src/app.js",
     "migrate": "prisma migrate dev --name init",
     "studio": "prisma studio"
   },
