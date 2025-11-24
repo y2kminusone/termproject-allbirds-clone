@@ -1,0 +1,56 @@
+.slide {
+  position: relative;
+  width: 100%;
+  height: 800px;
+  overflow: hidden;
+}
+
+.slide img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.slide-text {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color: #111111;
+}
+
+.slide-text h2 {
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+
+.slide-text p {
+  font-size: 20px;
+  margin-bottom: 36px;
+  font-weight: 300;
+  opacity: 0.9;
+}
+
+.buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.buttons button {
+  width: 155px;
+  height: 50px;
+  font-size: 16px;
+  border: none;
+  cursor: pointer;
+  background: #f9f9f9;
+  font-weight: 500;
+  transition: 0.25s;
+}
+
+.woman-sales:hover {
+  background: #111111;
+  color: #f9f9f9;
+}
