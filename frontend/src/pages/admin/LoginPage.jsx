@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect, useState } from "react";
+import { Navigate, useLocation, useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAuth } from "../../auth/AuthContext";
 import allbirdsLogo from "../../assets/allbirds.png";
@@ -79,22 +79,36 @@ const Error = styled.div`
 `;
 
 export default function LoginPage() {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const [username, setUsername] = useState("admin");
+  const [email, setEmail] = useState("admin@allbirds.com");
   const [password, setPassword] = useState("admin123");
   const [error, setError] = useState("");
+  const [submitting, setSubmitting] = useState(false);
 
-  const handleSubmit = (event) => {
-    event.preventDefault();
-    const result = login(username.trim(), password.trim());
-    if (result.success) {
+  useEffect(() => {
+    if (isAuthenticated) {
       const next = location.state?.from || "/admin/products";
       navigate(next, { replace: true });
-      return;
     }
-    setError(result.message || "로그인에 실패했습니다.");
+  }, [isAuthenticated, navigate, location.state]);
+
+  if (isAuthenticated) {
+    return <Navigate to="/admin/products" replace />;
+  }
+
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setError("");
+
+    const result = await login(email.trim(), password.trim());
+    if (!result.success) {
+      setError(result.message || "로그인에 실패했습니다.");
+    }
+
+    setSubmitting(false);
   };
 
   return (
@@ -103,12 +117,13 @@ export default function LoginPage() {
         <Logo src={allbirdsLogo} alt="Allbirds" />
         <form onSubmit={handleSubmit}>
           <Field>
-            <Label htmlFor="username">아이디</Label>
+            <Label htmlFor="email">이메일</Label>
             <Input
-              id="username"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="아이디를 입력하세요"
+              id="email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="이메일을 입력하세요"
             />
           </Field>
           <Field>
@@ -121,10 +136,12 @@ export default function LoginPage() {
               placeholder="비밀번호"
             />
           </Field>
-          <Button type="submit">로그인</Button>
+          <Button type="submit" disabled={submitting}>
+            {submitting ? "로그인 중..." : "로그인"}
+          </Button>
           {error && <Error>{error}</Error>}
         </form>
-        <Hint>관리자용 기본 계정: admin / admin123</Hint>
+        <Hint>관리자용 기본 계정: admin@allbirds.com / admin123</Hint>
       </Card>
     </Container>
   );
