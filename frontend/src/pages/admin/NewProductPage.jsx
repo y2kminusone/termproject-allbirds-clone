@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 import { useAdminData } from "../../data/AdminDataContext";
+import apiClient from "../../lib/apiClient";
 
 const SectionTitle = styled.h2`
   margin: 0 0 12px;
@@ -184,15 +185,20 @@ export default function NewProductPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({
     name: "",
-    summary: "",
+    description: "",
     price: "",
-    category: "라이프스타일",
+    categoryCode: "LIFESTYLE",
+    material: "TREE",
     sizes: ["250", "255", "260"],
     discountRate: "0",
+    imagePaths: [],
   });
-  const [imageFile, setImageFile] = useState(null);
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [newSize, setNewSize] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState("");
+  const [uploading, setUploading] = useState(false);
+  const [uploadMessage, setUploadMessage] = useState("");
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }));
@@ -217,32 +223,51 @@ export default function NewProductPage() {
     setIsSizeModalOpen(false);
   };
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const price = Number(form.price) || 0;
-    const thumbnail = imageFile ? URL.createObjectURL(imageFile) : undefined;
     const parsedDiscount = Number(form.discountRate);
     const discountRate = Number.isFinite(parsedDiscount)
-      ? Math.min(Math.max(parsedDiscount, 0), 90) / 100
+      ? Math.min(Math.max(parsedDiscount, 0), 90)
       : 0;
 
-    addProduct({
-      name: form.name || "새 상품",
-      summary: form.summary,
-      category: form.category,
-      price,
-      discountRate,
-      sizes: form.sizes,
-      thumbnail,
-    });
+    setSubmitting(true);
+    setError("");
+    try {
+      await addProduct({
+        name: form.name || "새 상품",
+        description: form.description,
+        categoryCode: form.categoryCode,
+        material: form.material,
+        price,
+        discountRate,
+        sizes: form.sizes.map((size) => Number(size)).filter((num) => Number.isFinite(num)),
+        imageUrls: form.imagePaths,
+      });
 
-    navigate("/admin/products");
+      navigate("/admin/products");
+    } catch (err) {
+      const message = err.response?.data?.message || "상품 등록에 실패했습니다.";
+      setError(message);
+    } finally {
+      setSubmitting(false);
+    }
   };
+
+  const previewImages = useMemo(() => {
+    if (!form.imagePaths?.length) return [];
+    const baseUrl = import.meta.env.VITE_API_URL || "http://localhost:3000";
+    return form.imagePaths.map((path) => {
+      if (path.startsWith("assets/uploads/")) return `${baseUrl}/${path}`;
+      if (path.startsWith("http")) return path;
+      return null;
+    });
+  }, [form.imagePaths]);
 
   return (
     <div>
       <SectionTitle>상품 등록</SectionTitle>
-      <Description>이미지 업로드, 기본 정보 입력 후 저장합니다.</Description>
+      <Description>이미지를 업로드하고 기본 정보를 입력해 저장합니다.</Description>
       <Form onSubmit={handleSubmit}>
         <Field>
           <Label htmlFor="name">상품명</Label>
@@ -258,8 +283,8 @@ export default function NewProductPage() {
           <Label htmlFor="summary">소개</Label>
           <TextArea
             id="summary"
-            value={form.summary}
-            onChange={(e) => updateField("summary", e.target.value)}
+            value={form.description}
+            onChange={(e) => updateField("description", e.target.value)}
             placeholder="간단한 상품 소개"
           />
         </Field>
@@ -277,13 +302,27 @@ export default function NewProductPage() {
         </Field>
         <Field>
           <Label htmlFor="category">카테고리</Label>
-          <Input
+          <select
             id="category"
-            value={form.category}
-            onChange={(e) => updateField("category", e.target.value)}
-            placeholder="라이프스타일 / 슬립온"
-            required
-          />
+            value={form.categoryCode}
+            onChange={(e) => updateField("categoryCode", e.target.value)}
+            style={{ padding: "10px", borderRadius: "10px", border: "1px solid #d1d5db" }}
+          >
+            <option value="LIFESTYLE">라이프스타일</option>
+            <option value="SLEEPON">슬립온</option>
+          </select>
+        </Field>
+        <Field>
+          <Label htmlFor="material">소재</Label>
+          <select
+            id="material"
+            value={form.material}
+            onChange={(e) => updateField("material", e.target.value)}
+            style={{ padding: "10px", borderRadius: "10px", border: "1px solid #d1d5db" }}
+          >
+            <option value="TREE">TREE</option>
+            <option value="WOOL">WOOL</option>
+          </select>
         </Field>
         <Field>
           <Label htmlFor="sizes">사이즈</Label>
@@ -316,17 +355,55 @@ export default function NewProductPage() {
           <Helper>0~90 사이 퍼센트 값으로 입력하세요.</Helper>
         </Field>
         <Field>
-          <Label htmlFor="image">이미지 업로드</Label>
-          <Input
+          <Label htmlFor="image">이미지 업로드 (여러 장 가능)</Label>
+          <input
             id="image"
             type="file"
             accept="image/*"
-            onChange={(e) => setImageFile(e.target.files?.[0] || null)}
+            multiple
+            onChange={async (e) => {
+              const files = Array.from(e.target.files || []);
+              if (!files.length) return;
+              setUploading(true);
+              setError("");
+              setUploadMessage("");
+              try {
+                const res = await apiClient.upload("/api/admin/uploads", files);
+                updateField("imagePaths", res.data.paths || []);
+                setUploadMessage(`${files.length}개 파일 업로드 완료`);
+              } catch (err) {
+                const message = err.response?.data?.message || "이미지 업로드에 실패했습니다.";
+                setError(message);
+              } finally {
+                setUploading(false);
+              }
+            }}
+            style={{ padding: "10px", borderRadius: "10px", border: "1px solid #d1d5db" }}
           />
-          <Helper>업로드한 이미지는 브라우저 URL로 즉시 미리보기됩니다.</Helper>
+          <Helper>업로드한 파일이 서버에 저장되고 해당 경로만 DB에 기록됩니다.</Helper>
+          {uploading && <Helper>업로드 중입니다...</Helper>}
+          {uploadMessage && <Helper>{uploadMessage}</Helper>}
+          {previewImages.length > 0 && (
+            <div style={{ display: "flex", gap: "8px", flexWrap: "wrap", marginTop: "10px" }}>
+              {previewImages.map(
+                (src, idx) =>
+                  src && (
+                    <img
+                      key={idx}
+                      src={src}
+                      alt="미리보기"
+                      style={{ width: "120px", borderRadius: "12px", border: "1px solid #e5e7eb" }}
+                    />
+                  ),
+              )}
+            </div>
+          )}
         </Field>
 
-        <Submit type="submit">등록하기</Submit>
+        {error && <Helper style={{ color: "#dc2626" }}>{error}</Helper>}
+        <Submit type="submit" disabled={submitting}>
+          {submitting ? "등록 중..." : "등록하기"}
+        </Submit>
       </Form>
 
       {isSizeModalOpen && (
