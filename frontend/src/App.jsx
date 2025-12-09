@@ -8,8 +8,8 @@ function App() {
     <>
       {/* <MainPage />
       <ManPage /> */}
-      {/* <ProductPage /> */}
-      <MainPage />
+      <ProductPage />
+      {/* <MainPage /> */}
     </>
   );
 }
