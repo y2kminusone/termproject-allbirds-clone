@@ -2,6 +2,18 @@ import { useMemo, useState } from "react";
 import styled from "styled-components";
 import { useAdminData } from "../../data/AdminDataContext";
 
+const placeholderImage =
+  "data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='140' height='90' viewBox='0 0 140 90'><rect width='140' height='90' fill='%23f5f5f5'/><text x='50%' y='50%' dominant-baseline='middle' text-anchor='middle' fill='%23777' font-size='12' font-family='Arial'>Allbirds</text></svg>";
+const BASE_URL = import.meta.env.VITE_API_URL || "http://localhost:3000";
+
+const resolveImage = (path) => {
+  if (!path) return null;
+  if (path.startsWith("assets/uploads/")) return `${BASE_URL}/${path}`;
+  if (path.startsWith("uploads/")) return `${BASE_URL}/${path}`;
+  if (path.startsWith("http")) return path;
+  return null;
+};
+
 const SectionTitle = styled.h2`
   margin: 0 0 12px;
   font-size: 22px;
@@ -211,18 +223,21 @@ const PopActions = styled.div`
 `;
 
 export default function ProductsPage() {
-  const { products, updateProduct } = useAdminData();
+  const { products, updateProduct, loading, error } = useAdminData();
   const [selected, setSelected] = useState(null);
   const [sizesList, setSizesList] = useState([]);
   const [discountInput, setDiscountInput] = useState("0");
   const [isSizeModalOpen, setIsSizeModalOpen] = useState(false);
   const [newSize, setNewSize] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [saveError, setSaveError] = useState("");
 
   const handleOpen = (product) => {
     setSelected(product);
-    setSizesList(product.sizes);
-    setDiscountInput(String(Math.round(product.discountRate * 100)));
+    setSizesList(product.sizes.map((size) => String(size)));
+    setDiscountInput(String(Math.round(product.discountRate || 0)));
     setIsSizeModalOpen(false);
+    setSaveError("");
   };
 
   const handleRemoveSize = (size) => {
@@ -237,31 +252,53 @@ export default function ProductsPage() {
     setIsSizeModalOpen(false);
   };
 
-  const handleSave = () => {
+  const handleSave = async () => {
     if (!selected) return;
     const parsedDiscount = Number(discountInput);
     const discountRate = Number.isFinite(parsedDiscount)
-      ? Math.min(Math.max(parsedDiscount, 0), 90) / 100
+      ? Math.min(Math.max(parsedDiscount, 0), 90)
       : 0;
 
-    updateProduct(selected.id, { sizes: sizesList, discountRate });
-    setSelected(null);
-    setIsSizeModalOpen(false);
+    const normalizedSizes = sizesList
+      .map((size) => Number(size))
+      .filter((size) => Number.isFinite(size));
+
+    setSaving(true);
+    setSaveError("");
+    try {
+      await updateProduct(selected.id, { sizes: normalizedSizes, discountRate });
+      setSelected(null);
+      setIsSizeModalOpen(false);
+    } catch (err) {
+      const message = err.response?.data?.message || "상품 저장에 실패했습니다.";
+      setSaveError(message);
+    } finally {
+      setSaving(false);
+    }
   };
 
   const rows = useMemo(
     () =>
-      products.map((product) => ({
+      (products || []).map((product) => ({
         ...product,
-        discounted: product.price * (1 - product.discountRate),
+        discounted: product.price * (1 - (product.discountRate || 0) / 100),
+        resolvedImage: resolveImage(product.thumbnail) || resolveImage(product.images?.[0]) || placeholderImage,
+        categoryDisplay: product.categoryName || product.categoryCode || "-",
       })),
     [products],
   );
 
+  if (loading) {
+    return <Description>상품을 불러오는 중입니다...</Description>;
+  }
+
   return (
     <div>
       <SectionTitle>상품 관리</SectionTitle>
-      <Description>목록에서 가용사이즈와 할인율을 바로 수정할 수 있습니다.</Description>
+      <Description>
+        목록에서 가용사이즈와 할인율을 바로 수정할 수 있습니다.
+        {error ? ` (${error})` : ""}
+      </Description>
       <Table>
         <thead>
           <tr>
@@ -279,12 +316,12 @@ export default function ProductsPage() {
           {rows.map((product) => (
             <tr key={product.id}>
               <td>
-                <Thumb src={product.thumbnail} alt={product.name} />
+                <Thumb src={product.resolvedImage || product.thumbnail || ""} alt={product.name} />
               </td>
               <td>{product.name}</td>
-              <td>{product.category}</td>
+              <td>{product.categoryDisplay}</td>
               <td>{product.price.toLocaleString()}원</td>
-              <td>{Math.round(product.discountRate * 100)}%</td>
+              <td>{Math.round(product.discountRate || 0)}%</td>
               <td>{Math.round(product.discounted).toLocaleString()}원</td>
               <td>{product.sizes.join(", ")}</td>
               <td>
@@ -328,6 +365,7 @@ export default function ProductsPage() {
               />
             </Field>
             <ModalActions>
+              {saveError && <Helper style={{ color: "#dc2626" }}>{saveError}</Helper>}
               <GhostButton
                 onClick={() => {
                   setSelected(null);
@@ -336,7 +374,9 @@ export default function ProductsPage() {
               >
                 취소
               </GhostButton>
-              <Button onClick={handleSave}>저장</Button>
+              <Button onClick={handleSave} disabled={saving}>
+                {saving ? "저장 중..." : "저장"}
+              </Button>
             </ModalActions>
           </ModalContent>
           {isSizeModalOpen && (

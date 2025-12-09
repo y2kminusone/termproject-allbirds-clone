@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import session from "express-session";
+import path from "path";
 import usersRouter from "./modules/users/users.router.js";
 import adminRouter from "./modules/admin/admin.router.js";
 
@@ -9,6 +10,8 @@ dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+const uploadDir = path.join(process.cwd(), "uploads");
+const frontendUploadsDir = path.resolve(process.cwd(), "../frontend/public/assets/uploads");
 
 app.use(
     cors({
@@ -17,6 +20,9 @@ app.use(
     })
 );
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use("/uploads", express.static(uploadDir));
+app.use("/assets/uploads", express.static(frontendUploadsDir));
 
 app.use(
     session({
@@ -37,7 +43,7 @@ app.get("/api/health", (req, res) => {
 });
 
 app.use("/api/users", usersRouter);
-app.use("/admin", adminRouter);
+app.use("/api/admin", adminRouter);
 
 app.listen(PORT, () => {
     console.log(`Server running on http://localhost:${PORT}`);

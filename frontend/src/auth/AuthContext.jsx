@@ -10,7 +10,7 @@ export function AuthProvider({ children }) {
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const res = await apiClient.get("/admin/session");
+        const res = await apiClient.get("/api/admin/session");
         if (res.data?.authenticated) {
           setUser(res.data.user);
         } else {
@@ -28,7 +28,7 @@ export function AuthProvider({ children }) {
 
   const login = async (email, password) => {
     try {
-      const res = await apiClient.post("/admin/login", { email, password });
+      const res = await apiClient.post("/api/admin/login", { email, password });
       setUser(res.data.user);
       return { success: true };
     } catch (error) {
@@ -41,7 +41,7 @@ export function AuthProvider({ children }) {
 
   const logout = async () => {
     try {
-      await apiClient.post("/admin/logout");
+      await apiClient.post("/api/admin/logout");
     } catch (error) {
       // ignore logout errors
     }

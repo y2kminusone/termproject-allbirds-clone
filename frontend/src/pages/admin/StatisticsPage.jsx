@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import styled from "styled-components";
 import { useAdminData } from "../../data/AdminDataContext";
 
@@ -67,20 +67,79 @@ const Table = styled.table`
   }
 `;
 
+const QueryButton = styled.button`
+  align-self: flex-end;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #111827;
+  background: #111827;
+  color: #ffffff;
+  font-weight: 700;
+  cursor: pointer;
+`;
+
+const defaultRange = () => {
+  const today = new Date();
+  const format = (date) => date.toISOString().slice(0, 10);
+  return {
+    start: "2025-01-01",
+    end: format(today),
+  };
+};
+
 export default function StatisticsPage() {
   const { getStatistics } = useAdminData();
-  const [startDate, setStartDate] = useState("2025-10-01");
-  const [endDate, setEndDate] = useState("2025-12-31");
+  const initialRange = useMemo(() => defaultRange(), []);
+  const [startDate, setStartDate] = useState(initialRange.start);
+  const [endDate, setEndDate] = useState(initialRange.end);
+  const [sales, setSales] = useState([]);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [summary, setSummary] = useState({ totalUnits: 0, totalRevenue: 0 });
 
-  const stats = useMemo(
-    () => getStatistics({ startDate, endDate }),
-    [getStatistics, startDate, endDate],
-  );
+  const fetchStats = async () => {
+    setLoading(true);
+    setError("");
+    try {
+      const data = await getStatistics({ startDate, endDate });
+      setSales(data.sales || data || []);
+      if (data.summary) {
+        setSummary({
+          totalUnits: data.summary.totalUnits ?? 0,
+          totalRevenue: data.summary.totalRevenue ?? 0,
+        });
+      } else {
+        const agg = (data.sales || data || []).reduce(
+          (acc, entry) => {
+            acc.totalUnits += entry.units || 0;
+            acc.totalRevenue += entry.revenue || 0;
+            return acc;
+          },
+          { totalUnits: 0, totalRevenue: 0 },
+        );
+        setSummary(agg);
+      }
+    } catch (err) {
+      const message = err.response?.data?.message || "판매 현황을 불러오지 못했습니다.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    // 최초 진입 시 1년 범위로 한 번 조회
+    fetchStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   return (
     <div>
       <SectionTitle>판매 현황</SectionTitle>
-      <Description>기간을 지정하여 제품별 판매수량과 매출을 확인합니다.</Description>
+      <Description>
+        기간을 지정하여 제품별 판매수량과 매출을 확인합니다.
+        {error ? ` (${error})` : ""}
+      </Description>
 
       <Filters>
         <Field>
@@ -96,8 +155,17 @@ export default function StatisticsPage() {
           <Label htmlFor="end">종료일</Label>
           <Input id="end" type="date" value={endDate} onChange={(e) => setEndDate(e.target.value)} />
         </Field>
+        <QueryButton type="button" onClick={fetchStats} disabled={loading}>
+          {loading ? "조회 중..." : "조회"}
+        </QueryButton>
       </Filters>
 
+      {loading && <Description>판매 현황을 불러오는 중입니다...</Description>}
+      {!loading && (
+        <Description>
+          총 판매수량: {summary.totalUnits}개 / 총 매출: {summary.totalRevenue.toLocaleString()}원
+        </Description>
+      )}
       <Table>
         <thead>
           <tr>
@@ -108,14 +176,17 @@ export default function StatisticsPage() {
           </tr>
         </thead>
         <tbody>
-          {stats.map((entry) => (
-            <tr key={entry.product.id}>
-              <td>{entry.product.name}</td>
-              <td>{entry.product.category}</td>
-              <td>{entry.units}개</td>
-              <td>{entry.revenue.toLocaleString()}원</td>
-            </tr>
-          ))}
+          {sales.map((entry) => {
+            const category = entry.categoryName || entry.categoryCode || "-";
+            return (
+              <tr key={entry.productId}>
+                <td>{entry.name}</td>
+                <td>{category}</td>
+                <td>{entry.units}개</td>
+                <td>{entry.revenue.toLocaleString()}원</td>
+              </tr>
+            );
+          })}
         </tbody>
       </Table>
     </div>
