@@ -1,0 +1,122 @@
+.detail-info {
+  margin-bottom: 40px;
+}
+
+.detail-info h1 {
+  font-size: 32px;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+
+.detail-info h2 {
+  font-size: 22px;
+  color: #222;
+  margin-bottom: 20px;
+}
+
+.thumbnail-list {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 30px;
+}
+
+.thumbnail {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 8px;
+  cursor: pointer;
+  border: 2px solid transparent;
+  transition: transform 0.2s ease, border 0.2s ease;
+}
+
+.thumbnail:hover {
+  border: 2px solid #000;
+  transform: scale(1.05);
+}
+
+.thumbnail.selected {
+  border: 2px solid #000;
+}
+
+.gender {
+  display: flex;
+  margin: 20px 0;
+}
+.gender button {
+  flex: 1;
+  height: 50px;
+  border: none;
+  font-size: 17px;
+  cursor: pointer;
+  transition: 0.2s;
+  border-radius: 0;
+}
+
+.gender button:first-child {
+  background-color: #111;
+  color: #fff;
+}
+
+.gender button:last-child {
+  background-color: #e9e6df;
+  color: #333;
+}
+
+.gender button:hover {
+  opacity: 0.85;
+}
+
+.size-section {
+  margin-top: 20px;
+}
+
+.size-section h3 {
+  font-size: 16px;
+  margin-bottom: 10px;
+}
+
+.size-list {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 10px;
+}
+
+.size-list button {
+  width: 60px;
+  height: 40px;
+  border: 1px solid #d6d6d6;
+  background: #fff;
+  border-radius: 2px;
+  cursor: pointer;
+  font-size: 15px;
+  transition: 0.2s;
+}
+
+.size-list button:hover {
+  border: 1.5px solid #000;
+}
+
+.size-list .selected {
+  border: 2px solid #222;
+}
+
+.cart {
+  width: 100%;
+  height: 55px;
+  background-color: #000;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-top: 10px;
+  border-radius: 6px;
+  transition: 0.2s ease;
+}
+
+.size-list button:disabled {
+  color: #aaa;
+  border: 1px solid #eee;
+  cursor: not-allowed;
+  background: #f7f7f7;
+}

@@ -1,15 +1,17 @@
-import Header from "./components/header/Header.jsx";
-import Product from "./components/product/Product.jsx";
-import Slide from "./components/slide/Slide.jsx";
+import "./App.css";
+import MainPage from "./components/MainPage.jsx";
+import ManPage from "./components/ManPage.jsx";
+import ProductPage from "./components/ProductPage.jsx";
 
 function App() {
-    return (
-        <>
-            <Header />
-            <Slide />
-            <Product />
-        </>
-    );
+  return (
+    <>
+      {/* <MainPage />
+      <ManPage /> */}
+      {/* <ProductPage /> */}
+      <MainPage />
+    </>
+  );
 }
 
 export default App;

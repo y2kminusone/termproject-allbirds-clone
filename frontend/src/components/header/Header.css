@@ -3,7 +3,7 @@
   max-width: 1440px;
   margin: 0 auto;
   padding: 0 20px;
-  border-bottom: 1px solid #f9f9f9;
+  border-bottom: 1px solid #f1f1f1;
 }
 
 header {
@@ -11,10 +11,25 @@ header {
   display: flex;
   align-items: center;
   justify-content: space-evenly;
+  position: relative;
+}
+
+.logo {
+  padding: 0;
+  margin: 0;
+  border: none;
+  background: none;
+  display: inline-block;
+}
+
+.logo:hover {
+  background: none;
+  box-shadow: none;
 }
 
 .logo img {
-  height: 28px;
+  height: 50px;
+  display: block;
   cursor: pointer;
 }
 
@@ -25,6 +40,7 @@ header {
 }
 
 .header-menu ul {
+  list-style: none;
   display: flex;
   gap: 50px;
 }
@@ -45,7 +61,7 @@ header {
 .header-image {
   display: flex;
   align-items: center;
-  gap: 20px;
+  gap: 10x;
   margin-right: -60px;
 }
 
@@ -67,29 +83,31 @@ header {
 }
 
 .header-menu ul li {
+  list-style: none;
   position: relative;
 }
 
 .dropdown {
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  position: fixed;
-  background: #f9f9f9;
-  gap: 80px;
-  top: 60px;
+  position: absolute;
+  top: 100%; /* 부모 li 바로 아래 */
   left: 0;
+
   width: 100%;
-  margin: 0 auto;
+  background: white;
+
+  display: flex;
   padding: 40px 60px;
-  z-index: 10;
+  gap: 80px;
+
   opacity: 0;
   visibility: hidden;
   transform: translateY(10px);
   transition: all 0.3s ease;
+  z-index: 10;
 }
 
 .dropdown > li {
+  list-style: none;
   flex: none;
   display: flex;
   flex-direction: column;
@@ -103,6 +121,7 @@ header {
 }
 
 .dropdown ul {
+  list-style: none;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -110,7 +129,7 @@ header {
 
 .dropdown ul li a {
   font-size: 16px;
-  color: #d2c8be;
+  color: #f1f1f1;
 }
 
 .header-menu ul li:hover > .dropdown {
@@ -121,6 +140,7 @@ header {
 }
 
 .dropdown > li ul {
+  list-style: none;
   border-left: 1.5px solid #e9e6df;
   padding-left: 20px;
   line-height: 2.2em;

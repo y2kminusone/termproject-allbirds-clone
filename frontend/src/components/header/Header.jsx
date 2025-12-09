@@ -6,7 +6,7 @@ function Header() {
     <div className="header">
       <header>
         <button className="logo">
-          <img src="/img/" alt="logo" />
+          <img src="/img/logo.png" alt="logo" />
         </button>
 
         <div className="header-menu">
@@ -19,10 +19,9 @@ function Header() {
             </li>
             <li>
               <a href="#">지속 가능성</a>
-              <ul className="dropdown">
-                <li>
-                  <a href="#">올버즈</a>
-                  <ul className="allbirds">
+              <div className="dropdown">
+                <div className="column">
+                  <ul>
                     <li>
                       <a href="#">브랜드 스토리</a>
                     </li>
@@ -36,11 +35,10 @@ function Header() {
                       <a href="#">수선</a>
                     </li>
                   </ul>
-                </li>
-
-                <li>
-                  <a href="#">스토리</a>
-                  <ul className="story">
+                </div>
+                <div className="column">
+                  <h3>스토리</h3>
+                  <ul>
                     <li>
                       <a href="#">올멤버스</a>
                     </li>
@@ -54,11 +52,11 @@ function Header() {
                       <a href="#">신발 관리 방법</a>
                     </li>
                   </ul>
-                </li>
+                </div>
 
-                <li>
-                  <a href="#">소식</a>
-                  <ul className="news">
+                <div className="column">
+                  <h3>소식</h3>
+                  <ul>
                     <li>
                       <a href="#">캠페인</a>
                     </li>
@@ -66,8 +64,8 @@ function Header() {
                       <a href="#">뉴스</a>
                     </li>
                   </ul>
-                </li>
-              </ul>
+                </div>
+              </div>
             </li>
           </ul>
         </div>

@@ -1,0 +1,45 @@
+.accordion {
+  margin-top: 40px;
+}
+
+.accordion-item {
+  border-bottom: 1px solid #ddd;
+  padding: 15px 0;
+}
+
+.accordion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  cursor: pointer;
+  font-size: 18px;
+}
+
+.accordion-header:hover {
+  opacity: 0.7;
+}
+
+.icon {
+  font-size: 22px;
+  font-weight: bold;
+}
+
+.accordion-content {
+  padding: 10px 0 20px 0;
+  line-height: 1.6;
+}
+
+.accordion-content p {
+  font-size: 15px;
+  color: #333;
+  margin-bottom: 8px;
+
+  position: relative;
+  padding-left: 14px;
+}
+.accordion-content p::before {
+  content: "-";
+  position: absolute;
+  left: 0;
+  top: 0;
+}

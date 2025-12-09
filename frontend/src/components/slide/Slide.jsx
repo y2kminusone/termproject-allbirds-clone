@@ -3,7 +3,7 @@ import "./Slide.css";
 
 const slides = [
   {
-    img: "/img/newSlide.png",
+    img: "/img/newSlide.jpg",
     title: "슈퍼 블랙 프라이데이 세일",
     desc: "세상에서 가장 편한 신발, 올버지 | ~50% OFF",
   },
