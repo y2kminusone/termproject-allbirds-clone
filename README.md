@@ -75,6 +75,7 @@ npm install
 ```bash
 DATABASE_URL="file:./mydb.sqlite"
 PORT=3000
+SESSION_SECRET="replace-me"
 ```
 
 ## 3-4) Prisma DB 마이그레이션
@@ -155,5 +156,4 @@ backend/
 * DB 스키마 변경되면 migrate dev 필수
 
 ---
-
 

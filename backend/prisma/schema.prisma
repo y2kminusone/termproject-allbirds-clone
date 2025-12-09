@@ -4,6 +4,7 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = env("DATABASE_URL")
 }
 
 enum Role {
@@ -28,14 +29,14 @@ enum OrderStatus {
 }
 
 model User {
-  id        Int       @id @default(autoincrement())
-  email     String    @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   password  String
   nickname  String
   role      Role
-  isActive  Boolean   @default(true) @map("is_active")
-  createdAt DateTime  @default(now()) @map("created_at")
-  updatedAt DateTime  @updatedAt @map("updated_at")
+  isActive  Boolean  @default(true) @map("is_active")
+  createdAt DateTime @default(now()) @map("created_at")
+  updatedAt DateTime @updatedAt @map("updated_at")
 
   cartItems CartItem[]
   orders    Order[]
@@ -45,22 +46,22 @@ model User {
 }
 
 model Product {
-  id          Int               @id @default(autoincrement())
+  id          Int      @id @default(autoincrement())
   name        String
   description String?
   price       Int
   material    Material
-  isActive    Boolean           @default(true) @map("is_active")
-  createdAt   DateTime          @default(now()) @map("created_at")
-  updatedAt   DateTime          @updatedAt @map("updated_at")
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  images      ProductImage[]
-  sizes       ProductSize[]
-  cartItems   CartItem[]
-  orderItems  OrderItem[]
-  reviews     Review[]
-  discounts   ProductDiscount[]
-  categories  ProductCategory[]
+  images     ProductImage[]
+  sizes      ProductSize[]
+  cartItems  CartItem[]
+  orderItems OrderItem[]
+  reviews    Review[]
+  discounts  ProductDiscount[]
+  categories ProductCategory[]
 
   @@map("products")
 }
@@ -73,20 +74,20 @@ model ProductImage {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product   Product  @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
   @@map("product_images")
 }
 
 model Category {
-  id        Int              @id @default(autoincrement())
+  id        Int          @id @default(autoincrement())
   code      CategoryCode
   name      String
-  isActive  Boolean          @default(true) @map("is_active")
-  createdAt DateTime         @default(now()) @map("created_at")
-  updatedAt DateTime         @updatedAt @map("updated_at")
+  isActive  Boolean      @default(true) @map("is_active")
+  createdAt DateTime     @default(now()) @map("created_at")
+  updatedAt DateTime     @updatedAt @map("updated_at")
 
-  products  ProductCategory[]
+  products ProductCategory[]
 
   @@map("categories")
 }
@@ -97,8 +98,8 @@ model ProductCategory {
   createdAt  DateTime @default(now()) @map("created_at")
   updatedAt  DateTime @updatedAt @map("updated_at")
 
-  product    Product  @relation(fields: [productId], references: [id])
-  category   Category @relation(fields: [categoryId], references: [id])
+  product  Product  @relation(fields: [productId], references: [id])
+  category Category @relation(fields: [categoryId], references: [id])
 
   @@id([productId, categoryId])
   @@map("product_categories")
@@ -112,7 +113,7 @@ model ProductSize {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
 
-  product   Product  @relation(fields: [productId], references: [id])
+  product   Product    @relation(fields: [productId], references: [id])
   cartItems CartItem[]
 
   @@unique([productId, size])
@@ -120,32 +121,32 @@ model ProductSize {
 }
 
 model CartItem {
-  id            Int         @id @default(autoincrement())
-  userId        Int         @map("user_id")
-  productId     Int         @map("product_id")
-  productSizeId Int         @map("product_size_id")
+  id            Int      @id @default(autoincrement())
+  userId        Int      @map("user_id")
+  productId     Int      @map("product_id")
+  productSizeId Int      @map("product_size_id")
   quantity      Int
-  createdAt     DateTime    @default(now()) @map("created_at")
-  updatedAt     DateTime    @updatedAt @map("updated_at")
+  createdAt     DateTime @default(now()) @map("created_at")
+  updatedAt     DateTime @updatedAt @map("updated_at")
 
-  user          User        @relation(fields: [userId], references: [id])
-  product       Product     @relation(fields: [productId], references: [id])
-  productSize   ProductSize @relation(fields: [productSizeId], references: [id])
+  user        User        @relation(fields: [userId], references: [id])
+  product     Product     @relation(fields: [productId], references: [id])
+  productSize ProductSize @relation(fields: [productSizeId], references: [id])
 
   @@unique([userId, productId, productSizeId])
   @@map("cart_items")
 }
 
 model Order {
-  id         Int          @id @default(autoincrement())
-  userId     Int          @map("user_id")
-  totalPrice Int          @map("total_price")
-  status     OrderStatus  @default(PAID)
-  createdAt  DateTime     @default(now()) @map("created_at")
-  updatedAt  DateTime     @updatedAt @map("updated_at")
+  id         Int         @id @default(autoincrement())
+  userId     Int         @map("user_id")
+  totalPrice Int         @map("total_price")
+  status     OrderStatus @default(PAID)
+  createdAt  DateTime    @default(now()) @map("created_at")
+  updatedAt  DateTime    @updatedAt @map("updated_at")
 
-  user       User         @relation(fields: [userId], references: [id])
-  items      OrderItem[]
+  user  User        @relation(fields: [userId], references: [id])
+  items OrderItem[]
 
   @@map("orders")
 }
@@ -162,27 +163,27 @@ model OrderItem {
   createdAt   DateTime @default(now()) @map("created_at")
   updatedAt   DateTime @updatedAt @map("updated_at")
 
-  order       Order    @relation(fields: [orderId], references: [id])
-  product     Product  @relation(fields: [productId], references: [id])
-  review      Review?
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+  review  Review?
 
   @@map("order_items")
 }
 
 model Review {
-  id           Int      @id @default(autoincrement())
-  orderItemId  Int      @map("order_item_id")
-  userId       Int      @map("user_id")
-  productId    Int      @map("product_id")
-  rating       Int
-  content      String
-  isActive     Boolean  @default(true) @map("is_active")
-  createdAt    DateTime @default(now()) @map("created_at")
-  updatedAt    DateTime @updatedAt @map("updated_at")
+  id          Int      @id @default(autoincrement())
+  orderItemId Int      @map("order_item_id")
+  userId      Int      @map("user_id")
+  productId   Int      @map("product_id")
+  rating      Int
+  content     String
+  isActive    Boolean  @default(true) @map("is_active")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
 
-  orderItem    OrderItem @relation(fields: [orderItemId], references: [id])
-  user         User      @relation(fields: [userId], references: [id])
-  product      Product   @relation(fields: [productId], references: [id])
+  orderItem OrderItem @relation(fields: [orderItemId], references: [id])
+  user      User      @relation(fields: [userId], references: [id])
+  product   Product   @relation(fields: [productId], references: [id])
 
   @@unique([orderItemId])
   @@map("reviews")
@@ -198,7 +199,7 @@ model ProductDiscount {
   createdAt    DateTime @default(now()) @map("created_at")
   updatedAt    DateTime @updatedAt @map("updated_at")
 
-  product      Product  @relation(fields: [productId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
 
   @@map("product_discount")
 }
