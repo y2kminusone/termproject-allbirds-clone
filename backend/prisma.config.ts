@@ -9,7 +9,9 @@ export default defineConfig({
         path: "prisma/migrations",
     },
     datasource: {
-        // Prisma 7 방식: env 헬퍼로 읽기
         url: env("DATABASE_URL"),
+    },
+    client: {
+        engineType: "binary",
     },
 });
