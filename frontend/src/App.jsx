@@ -6,10 +6,9 @@ import ProductPage from "./components/ProductPage.jsx";
 function App() {
   return (
     <>
-      {/* <MainPage />
-      <ManPage /> */}
-      <ProductPage />
-      {/* <MainPage /> */}
+      <MainPage />
+      {/* <ManPage /> */}
+      {/* <ProductPage /> */}
     </>
   );
 }

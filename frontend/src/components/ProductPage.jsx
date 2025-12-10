@@ -15,10 +15,8 @@ function ProductPage() {
 
   return (
     <>
-      {/* 상품 상세 페이지 */}
       <DetailPage productId={productId} onAddToCart={handleAddToCart} />
 
-      {/* 오른쪽 슬라이드 CartPage */}
       <CartPage
         isOpen={isCartOpen}
         onClose={() => setIsCartOpen(false)}
