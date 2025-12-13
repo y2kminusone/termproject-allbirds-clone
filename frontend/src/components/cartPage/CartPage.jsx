@@ -1,4 +1,3 @@
-// src/components/cartPage/CartPage.jsx
 import "./CartPage.css";
 
 function CartPage({
@@ -9,10 +8,7 @@ function CartPage({
   onRemove,
   onPayment,
 }) {
-  const totalPrice = cartItems.reduce(
-    (sum, item) => sum + item.price * item.qty,
-    0
-  );
+  const totalPrice = cartItems.reduce((sum, item) => sum + item.lineTotal, 0);
 
   return (
     <>
@@ -33,23 +29,22 @@ function CartPage({
             <h3 className="empty">장바구니가 비어있습니다.</h3>
           ) : (
             cartItems.map((item) => (
-              <div key={`${item.productId}-${item.size}`} className="cart-item">
-                <img src={item.image} className="cart-thumb" />
+              <div key={item.cartItemId} className="cart-item">
+                <img
+                  src={item.imageUrl}
+                  alt={item.name}
+                  className="cart-thumb"
+                />
 
                 <div className="cart-info">
                   <p>{item.name}</p>
-                  <p>{item.size}</p>
-                  <p>₩{item.price.toLocaleString()}</p>
+                  <p>사이즈: {item.size}</p>
+                  <p>₩{item.unitPrice.toLocaleString()}</p>
 
                   <div className="qty-box">
                     <button onClick={() => onUpdateQty(item, -1)}>-</button>
-                    <span>{item.qty}</span>
-                    <button
-                      onClick={() => onUpdateQty(item, 1)}
-                      disabled={item.qty >= item.stock}
-                    >
-                      +
-                    </button>
+                    <span>{item.quantity}</span>
+                    <button onClick={() => onUpdateQty(item, 1)}>+</button>
                   </div>
                 </div>
 

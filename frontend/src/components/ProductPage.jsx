@@ -4,80 +4,64 @@ import DetailPage from "../components/detailPage/DetailPage";
 import CartPage from "../components/cartPage/CartPage";
 import Review from "../components/review/Review";
 
+const USER_ID = 1; // ⚠️ 로그인 붙으면 여기 제거
+
 function ProductPage() {
   const { productId } = useParams();
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [cartItems, setCartItems] = useState([]);
 
   useEffect(() => {
-    fetch("/api/cart", { credentials: "include" })
+    fetch(`/api/cart?userId=${USER_ID}`, { credentials: "include" })
       .then((res) => res.json())
-      .then(setCartItems)
+      .then((data) => setCartItems(data.items))
       .catch(console.error);
   }, []);
 
-  const handleAddToCart = async (item) => {
-    const exist = cartItems.find(
-      (c) => c.productId === item.productId && c.size === item.size
-    );
-
-    if (exist) {
-      handleUpdateQty(exist, 1);
-      return;
-    }
-
-    const res = await fetch("/api/cart", {
+  const handleAddToCart = async ({ productId, size }) => {
+    const res = await fetch(`/api/cart?userId=${USER_ID}`, {
       method: "POST",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(item),
+      body: JSON.stringify({
+        productId,
+        size,
+        quantity: 1,
+      }),
     });
 
-    const saved = await res.json();
-    setCartItems((prev) => [...prev, saved]);
+    const data = await res.json();
+    setCartItems(data.items);
     setIsCartOpen(true);
   };
 
   const handleUpdateQty = async (item, diff) => {
-    const nextQty = item.qty + diff;
+    const nextQty = item.quantity + diff;
+    if (nextQty < 1) return;
 
-    if (nextQty < 1) {
-      handleRemove(item);
-      return;
-    }
-    if (nextQty > item.stock) return;
-
-    await fetch(`/api/cart/${item.productId}`, {
+    const res = await fetch(`/api/cart/${item.cartItemId}?userId=${USER_ID}`, {
       method: "PATCH",
       credentials: "include",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ diff }),
+      body: JSON.stringify({ quantity: nextQty }),
     });
 
-    setCartItems((prev) =>
-      prev.map((c) =>
-        c.productId === item.productId && c.size === item.size
-          ? { ...c, qty: nextQty }
-          : c
-      )
-    );
+    const data = await res.json();
+    setCartItems(data.items);
   };
 
   const handleRemove = async (item) => {
-    await fetch(`/api/cart/${item.productId}`, {
+    const res = await fetch(`/api/cart/${item.cartItemId}?userId=${USER_ID}`, {
       method: "DELETE",
       credentials: "include",
     });
 
-    setCartItems((prev) =>
-      prev.filter(
-        (c) => !(c.productId === item.productId && c.size === item.size)
-      )
-    );
+    const data = await res.json();
+    setCartItems(data.items);
   };
 
   const handlePayment = async () => {
-    await fetch("/api/cart", {
+    await fetch(`/api/cart?userId=${USER_ID}`, {
       method: "DELETE",
       credentials: "include",
     });
@@ -88,11 +72,7 @@ function ProductPage() {
 
   return (
     <>
-      <DetailPage
-        productId={productId}
-        cartItems={cartItems}
-        onAddToCart={handleAddToCart}
-      />
+      <DetailPage productId={productId} onAddToCart={handleAddToCart} />
 
       <Review productId={productId} />
 

@@ -1,7 +1,9 @@
 import React from "react";
 import "./Header.css";
+import { useNavigate } from "react-router-dom";
 
-function Header() {
+function Header({ onCartClick }) {
+  const navigate = useNavigate();
   return (
     <div className="header">
       <header>
@@ -81,10 +83,10 @@ function Header() {
           <button>
             <img src="/img/search.png" alt="search" />
           </button>
-          <button>
+          <button onClick={() => navigate("/mypage")}>
             <img src="/img/user.png" alt="user" />
           </button>
-          <button>
+          <button onClick={onCartClick}>
             <img src="/img/cart.png" alt="cart" />
           </button>
         </div>

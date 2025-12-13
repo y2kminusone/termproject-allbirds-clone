@@ -3,7 +3,7 @@ import DetailProducts from "./DetailProducts";
 import Accodian, { accodian } from "./Accodian";
 import "./DetailPage.css";
 
-function DetailPage({ productId, onAddToCart, cartItems }) {
+function DetailPage({ productId, onAddToCart }) {
   const [product, setProduct] = useState(null);
   const [mainImage, setMainImage] = useState("");
 
@@ -12,7 +12,7 @@ function DetailPage({ productId, onAddToCart, cartItems }) {
       .then((res) => res.json())
       .then((data) => {
         setProduct(data);
-        setMainImage(data.images?.[0]);
+        setMainImage(data.images?.[0]?.imageUrl ?? "");
       })
       .catch(console.error);
   }, [productId]);
@@ -26,11 +26,7 @@ function DetailPage({ productId, onAddToCart, cartItems }) {
         <Accodian items={accodian} />
       </div>
 
-      <DetailProducts
-        product={product}
-        cartItems={cartItems}
-        onAddToCart={onAddToCart}
-      />
+      <DetailProducts product={product} onAddToCart={onAddToCart} />
     </div>
   );
 }

@@ -52,7 +52,6 @@ function ReviewWrite() {
     <div className="review-write-container">
       <h2>후기 작성</h2>
 
-      {/* 별점 */}
       <div className="rating">
         {[1, 2, 3, 4, 5].map((num) => (
           <span
@@ -65,7 +64,6 @@ function ReviewWrite() {
         ))}
       </div>
 
-      {/* 내용 */}
       <textarea
         placeholder="상품에 대한 후기를 작성해주세요."
         value={content}

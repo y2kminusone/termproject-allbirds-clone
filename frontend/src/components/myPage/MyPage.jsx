@@ -8,7 +8,7 @@ function MyPage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("/api/orders/me", {
+    fetch("/api/users/me/orders", {
       method: "GET",
       credentials: "include",
     })
