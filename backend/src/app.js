@@ -5,6 +5,7 @@ import session from "express-session";
 import path from "path";
 import usersRouter from "./modules/users/users.router.js";
 import adminRouter from "./modules/admin/admin.router.js";
+import cartRouter from "./modules/cart/cart.router.js";
 
 dotenv.config();
 
@@ -23,6 +24,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(uploadDir));
 app.use("/assets/uploads", express.static(frontendUploadsDir));
+app.use("/cart", cartRouter);
 
 app.use(
     session({
