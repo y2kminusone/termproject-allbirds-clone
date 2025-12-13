@@ -1,0 +1,113 @@
+/* 전체 레이아웃 */
+.mypage-container {
+  display: flex;
+  max-width: 1200px;
+  margin: 40px auto;
+  gap: 40px;
+}
+
+/* 왼쪽 메뉴 */
+.mypage-menu {
+  width: 200px;
+}
+
+.mypage-menu h3 {
+  font-size: 18px;
+  margin-bottom: 20px;
+}
+
+.mypage-menu ul {
+  list-style: none;
+  padding: 0;
+}
+
+.mypage-menu li {
+  margin-bottom: 14px;
+  cursor: pointer;
+  color: #333;
+}
+
+.mypage-menu li.active {
+  font-weight: bold;
+}
+
+.mypage-menu .logout {
+  margin-top: 30px;
+  color: #777;
+}
+
+/* 오른쪽 콘텐츠 */
+.mypage-content {
+  flex: 1;
+}
+
+.mypage-content h2 {
+  font-size: 24px;
+  margin-bottom: 24px;
+}
+
+/* 주문내역 조회 버튼 */
+.order-fetch-btn {
+  padding: 12px 22px;
+  background: #000;
+  color: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  border: none;
+  margin-bottom: 20px;
+}
+
+.order-fetch-btn:hover {
+  background: #333;
+}
+
+/* 빈 텍스트 */
+.empty-text {
+  color: #888;
+  margin-top: 20px;
+}
+
+/* 주문 카드 */
+.order-card {
+  background: #bdbbbb;
+  padding: 26px 36px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
+}
+
+/* 왼쪽 정보 */
+.order-info p {
+  color: #0047ff;
+  font-size: 16px;
+  margin: 4px 0;
+}
+
+/* 오른쪽 정보 묶음 (수량, 날짜 느낌) */
+.order-info {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  column-gap: 68px;
+}
+
+/* 후기 작성 버튼 */
+.review-btn {
+  background: #5fa0d8;
+  color: #fff;
+  border: none;
+  padding: 12px 26px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 15px;
+}
+
+.review-btn:hover {
+  background: #4a8bc4;
+}
+
+/* 작성 완료 */
+.review-btn.done {
+  background: #aaa;
+  cursor: not-allowed;
+}

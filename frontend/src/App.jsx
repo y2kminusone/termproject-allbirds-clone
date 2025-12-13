@@ -1,16 +1,17 @@
-import "./App.css";
-import MainPage from "./components/MainPage.jsx";
-import ManPage from "./components/ManPage.jsx";
-import ProductPage from "./components/ProductPage.jsx";
+import { BrowserRouter, Routes, Route } from "react-router-dom";
+import ProductPage from "./pages/ProductPage";
+import MyPage from "./pages/MyPage";
+import ReviewWrite from "./pages/ReviewWrite";
 
 function App() {
   return (
-    <>
-      {/* <MainPage />
-      <ManPage /> */}
-      <ProductPage />
-      {/* <MainPage /> */}
-    </>
+    <BrowserRouter>
+      <Routes>
+        <Route path="/products/:productId" element={<ProductPage />} />
+        <Route path="/mypage" element={<MyPage />} />
+        <Route path="/review/write" element={<ReviewWrite />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 

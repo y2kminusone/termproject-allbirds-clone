@@ -1,65 +1,113 @@
-import { useState } from "react";
-import "./DetailProducts.css";
+import { useEffect, useState } from "react";
+import "./Review.css";
 
-function DetailProducts({ product, onChangeMainImage, onAddToCart }) {
-  const [selectedSize, setSelectedSize] = useState(null);
-  // const navigate = useNavigate();
-  const handleAdd = () => {
-    onAddToCart({
-      productId: product.id,
-      name: product.name,
-      price: product.price,
-      size: selectedSize,
-      image: product.images[0],
-    });
+function Review({ productId }) {
+  const [reviews, setReviews] = useState([]);
+  const [rating, setRating] = useState(5);
+  const [content, setContent] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (!productId) return;
+
+    fetch(`/api/products/${productId}/reviews`)
+      .then((res) => res.json())
+      .then((data) => setReviews(data))
+      .catch(console.error);
+  }, [productId]);
+
+  const submitReview = async () => {
+    if (!content.trim()) {
+      alert("리뷰 내용을 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      await fetch(`/api/products/${productId}/reviews`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+        body: JSON.stringify({
+          rating,
+          content,
+        }),
+      });
+
+      const res = await fetch(`/api/products/${productId}/reviews`);
+      const data = await res.json();
+      setReviews(data);
+
+      setContent("");
+      setRating(5);
+    } catch (err) {
+      console.error(err);
+      alert("리뷰 작성 실패");
+    } finally {
+      setLoading(false);
+    }
   };
 
+  const average =
+    reviews.length > 0
+      ? reviews.reduce((sum, r) => sum + r.rating, 0) / reviews.length
+      : 0;
+
   return (
-    <div className="detail-page">
-      <h1>{product.name}</h1>
-      <h2>₩{product.price.toLocaleString()}</h2>
-
-      <p>{product.description}</p>
-      <div className="thumbnail-list">
-        {product.variants?.map((img, index) => (
-          <img
-            key={index}
-            src={img}
-            className="thumbnail"
-            onClick={() => onChangeMainImage(img)}
-            // onClick={()=>navigate(`/product/${item.id}`)}
-          />
-        ))}
-      </div>
-
-      <div className="gender">
-        <button>남성</button>
-        <button>여성</button>
-      </div>
-
-      <div className="size-selection">
-        <h3>사이즈</h3>
-        <div className="size-list">
-          {product.sizes.map((s) => (
-            <button
-              key={s.size}
-              disabled={!s.stock}
-              onClick={() => setSelectedSize(s.size)}
-              className={selectedSize === s.size ? "selected" : ""}
-            >
-              {s.size}
-            </button>
-          ))}
+    <div className="review-wrapper">
+      <div className="review-summary">
+        <div className="score">{average.toFixed(1)}</div>
+        <div className="stars">
+          {"★".repeat(Math.round(average))}
+          <span className="count">({reviews.length})</span>
         </div>
       </div>
 
-      {selectedSize && (
-        <button className="cart" onClick={handleAdd}>
-          장바구니 담기 ₩{product.price.toLocaleString()}
+      <div className="review-form">
+        <h3>리뷰 작성</h3>
+
+        <select value={rating} onChange={(e) => setRating(+e.target.value)}>
+          {[5, 4, 3, 2, 1].map((n) => (
+            <option key={n} value={n}>
+              {n}점
+            </option>
+          ))}
+        </select>
+
+        <textarea
+          placeholder="리뷰를 작성해주세요"
+          value={content}
+          onChange={(e) => setContent(e.target.value)}
+        />
+
+        <button onClick={submitReview} disabled={loading}>
+          {loading ? "등록 중..." : "등록"}
         </button>
-      )}
+      </div>
+
+      <div className="review-list">
+        {reviews.length === 0 && (
+          <p className="empty-text">아직 작성된 리뷰가 없습니다.</p>
+        )}
+
+        {reviews.map((r) => (
+          <div key={r.id} className="review-item">
+            <div className="review-header">
+              <span className="review-name">{r.writerName ?? "익명"}</span>
+              <span className="review-date">{r.createdAt?.slice(0, 10)}</span>
+            </div>
+
+            <div className="review-stars">{"★".repeat(r.rating)}</div>
+
+            <p className="review-content">{r.content}</p>
+          </div>
+        ))}
+      </div>
     </div>
   );
 }
 
-export default DetailProducts;
+export default Review;
