@@ -7,6 +7,7 @@ import usersRouter from "./modules/users/users.router.js";
 import adminRouter from "./modules/admin/admin.router.js";
 import cartRouter from "./modules/cart/cart.router.js";
 import ordersRouter from "./modules/orders/orders.router.js";
+import reviewsRouter from "./modules/review/reviews.router.js";
 
 dotenv.config();
 
@@ -27,6 +28,7 @@ app.use("/uploads", express.static(uploadDir));
 app.use("/assets/uploads", express.static(frontendUploadsDir));
 app.use("/api/cart", cartRouter);
 app.use("/api/orders", ordersRouter);
+app.use("/api/products", reviewsRouter);
 
 app.use(
     session({
