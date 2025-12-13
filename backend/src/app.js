@@ -6,6 +6,7 @@ import path from "path";
 import usersRouter from "./modules/users/users.router.js";
 import adminRouter from "./modules/admin/admin.router.js";
 import cartRouter from "./modules/cart/cart.router.js";
+import ordersRouter from "./modules/orders/orders.router.js";
 
 dotenv.config();
 
@@ -24,7 +25,8 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(uploadDir));
 app.use("/assets/uploads", express.static(frontendUploadsDir));
-app.use("/cart", cartRouter);
+app.use("/api/cart", cartRouter);
+app.use("/api/orders", ordersRouter);
 
 app.use(
     session({
